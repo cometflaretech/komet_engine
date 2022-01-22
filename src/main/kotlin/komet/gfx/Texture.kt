@@ -14,7 +14,9 @@ class Texture {
     var channels = 0
         private set
 
-    private var gpuId = 0
+    var gpuId = 0
+        private set
+
     private var bound = false
 
     fun build(filePath: String) {

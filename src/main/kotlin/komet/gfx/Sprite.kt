@@ -17,7 +17,9 @@ data class Sprite(
         Vector2(0f, 1f),
     ),
 
-    var texture: String = ""
+    var texture: String = "",
+    var width: Int = 0,
+    var height: Int = 0,
 ) {
     //@Transient var texture: Texture? = null
     override fun equals(other: Any?): Boolean {

@@ -1,5 +1,6 @@
 package komet
 
+import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.GLFW_PRESS
 import org.lwjgl.glfw.GLFW.GLFW_RELEASE
 
@@ -32,6 +33,26 @@ object MouseListener {
 
     val sy: Float
         get() = scrollY.toFloat()
+
+    val ox: Float
+        get() {
+            val currentX = (x / Window.width) * 2f - 1f
+            val tmp = Vector4f(currentX, 0f, 0f, 1f)
+            Window.currentScene?.camera?.let {
+                tmp.mul(it.inverseProjection).mul(it.inverseView)
+            }
+            return tmp.x
+        }
+
+    val oy: Float
+        get() {
+            val currentY = (y / Window.height) * 2f - 1f
+            val tmp = Vector4f(0f, currentY, 0f, 1f)
+            Window.currentScene?.camera?.let {
+                tmp.mul(it.inverseProjection).mul(it.inverseView)
+            }
+            return tmp.y
+        }
 
     fun mouseButtonDown(button: Int) = mouseButtonPressed[button]
 

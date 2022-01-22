@@ -7,7 +7,7 @@
 
 #### Supported Rendering Backends
 * OpenGL 4.6
-* Vulkan is planned in the future*
+* BGFX is planned for the future*
 
 #### Supported Audio Backends
 * Currently none
@@ -17,7 +17,7 @@
 * Serialization and deserialization made easy
 * Inspectable code in the editor using reflection
 * Mouse and Keyboard input events
-* Entity-Component based (Systems are planned in the future*)
+* Entity-Component based (Systems are planned for the future*)
 * Support for adding custom shaders and textures
 * Batch rendering for maximum performance
 * Easy to code, easy to deploy, easy to maintain

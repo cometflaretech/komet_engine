@@ -7,13 +7,14 @@ import org.joml.Vector3f
 class Camera(var location: Vector2 = Vector2()) {
     private var viewMatrix = Matrix4f()
 
-    var projectionMatrix = Matrix4f()
+    var inverseProjection = Matrix4f()
         private set
 
-    init {
-        projectionMatrix.identity()
-        projectionMatrix.ortho(0f, 32f * 40f, 0f, 32f * 21f, 0f, 100f)
-    }
+    var inverseView = Matrix4f()
+        private set
+
+    var projectionMatrix = Matrix4f()
+        private set
 
     val computedViewMatrix: Matrix4f
         get() {
@@ -25,6 +26,17 @@ class Camera(var location: Vector2 = Vector2()) {
                 cameraFront.add(location.x, location.y, 0f),
                 cameraUp,
             )
+            viewMatrix.invert(inverseView)
             return viewMatrix
         }
+
+    init {
+        adjustProjection()
+    }
+
+    fun adjustProjection() {
+        projectionMatrix.identity()
+        projectionMatrix.ortho(0f, 32f * 40f, 0f, 32f * 21f, 0f, 100f)
+        projectionMatrix.invert(inverseProjection)
+    }
 }

@@ -20,7 +20,7 @@ object Window {
     var height: Int = 1080
         private set
 
-    var title: String = "Komet Engine v.0.1.0-alpha.dev.21"
+    var title: String = "Komet Engine v.0.1.0-alpha.dev.22"
         private set
 
     var internalWindow: Long = NULL

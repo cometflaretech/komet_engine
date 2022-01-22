@@ -9,7 +9,8 @@ class SpriteSheet(
     var numSprites: Int,
     var spacing: Int,
 ) {
-    private var sprites = mutableListOf<Sprite>()
+    var sprites = mutableListOf<Sprite>()
+        private set
 
     var texture: String = ""
         set(value) {
@@ -37,7 +38,11 @@ class SpriteSheet(
                 Vector2(leftX, topY),
             )
 
-            sprites.add(Sprite(aTexCoords = texCoords).also { it.texture = texture })
+            sprites.add(Sprite(
+                aTexCoords = texCoords,
+                width = width,
+                height = height,
+            ).also { it.texture = texture })
 
             currentX += width + spacing
             if (currentX >= asset.width) {
@@ -46,6 +51,4 @@ class SpriteSheet(
             }
         }
     }
-
-    fun getSprite(index: Int) = sprites[index]
 }

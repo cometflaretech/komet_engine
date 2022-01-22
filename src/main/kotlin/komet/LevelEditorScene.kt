@@ -8,6 +8,7 @@ import komet.gfx.Sprite
 import komet.util.AssetPool
 import komet.util.Vector2
 import imgui.ImGui
+import imgui.ImVec2
 import kotlinx.serialization.*
 import org.lwjgl.glfw.GLFW
 
@@ -26,8 +27,6 @@ class LevelEditorScene : Scene() {
                 c.sprite = AssetPool.getSpriteSheet("assets/textures/stars.png")?.getSprite(1)
             })
         }
-
-
 
         addEntity("Square").also { e ->
             e.transform.apply {
@@ -53,7 +52,7 @@ class LevelEditorScene : Scene() {
             }) as SpriteRenderer?
         }*/
 
-        camera = Camera()
+        camera = Camera(Vector2(-250f, 0f))
 
         //serialize("level1.json")
     }
@@ -65,8 +64,6 @@ class LevelEditorScene : Scene() {
         //    blueStar.zIndex = -blueStar.zIndex
         //}
 
-
-
         if (KeyListener.keyDown(GLFW.GLFW_KEY_M)) {
             serialize("level1.json")
         }
@@ -75,7 +72,49 @@ class LevelEditorScene : Scene() {
     }
 
     override fun imgui() {
-        ImGui.begin("Pekka Kana 3")
+        ImGui.begin("Palette")
+
+        val windowPos = ImVec2()
+        ImGui.getWindowPos(windowPos)
+        val windowSize = ImVec2()
+        ImGui.getWindowSize(windowSize)
+        val itemSpacing = ImVec2()
+        ImGui.getStyle().getItemSpacing(itemSpacing)
+
+        val windowX2 = windowPos.x + windowSize.x
+
+        val sprites = AssetPool.getSpriteSheet("assets/textures/stars.png")?.sprites
+        sprites?.let {
+            for ((i, sprite) in it.withIndex()) {
+                val spriteSize = 64f
+                val id = AssetPool.getTexture(sprite.texture)?.gpuId ?: -1
+                val texCoords = sprite.aTexCoords
+
+                ImGui.pushID(i)
+                if (ImGui.imageButton(
+                        id,
+                        spriteSize,
+                        spriteSize,
+                        texCoords[0].x,
+                        texCoords[0].y,
+                        texCoords[2].x,
+                        texCoords[2].y,
+                    )) {
+                    println("Button $i clicked")
+                }
+                ImGui.popID()
+
+                val lastButtonPos = ImVec2()
+                ImGui.getItemRectMax(lastButtonPos)
+                val lastButtonX2 = lastButtonPos.x
+                val nextButtonX2 = lastButtonX2 + itemSpacing.x + spriteSize
+
+                if (i + 1 < sprites.size && nextButtonX2 < windowX2) {
+                    ImGui.sameLine()
+                }
+            }
+        }
+
         ImGui.end()
     }
 }
