@@ -17,7 +17,22 @@ import kotlin.reflect.jvm.isAccessible
 
 @Serializable
 abstract class Component {
-    @Transient var entity: Entity? = null
+    companion object {
+        var id_counter = 0
+            internal set
+    }
+
+    var uuid = -1
+        private set
+
+    @Transient
+    var entity: Entity? = null
+
+    internal fun generateId() {
+        if (uuid == -1) {
+            uuid = id_counter++
+        }
+    }
 
     open fun start(): Unit? = null
     open fun update(dt: Float): Unit? = null

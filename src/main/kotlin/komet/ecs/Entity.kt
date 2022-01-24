@@ -5,6 +5,14 @@ import kotlinx.serialization.*
 
 @Serializable
 class Entity {
+    companion object {
+        var id_counter = 0
+            internal set
+    }
+
+    var uuid = -1
+        private set
+
     @Required
     var components = mutableListOf<Component>()
         private set
@@ -19,6 +27,10 @@ class Entity {
                 // todo. update RenderBatch for real time (+compare())
             }
         }
+
+    init {
+        uuid = id_counter++
+    }
 
     fun <T : Component?> getComponent(componentClass: Class<T>): T? {
         for (c in components) {
@@ -45,6 +57,7 @@ class Entity {
     }
 
     fun addComponent(c: Component): Component {
+        c.generateId()
         components.add(c)
         c.entity = this
         return c

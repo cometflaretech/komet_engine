@@ -6,6 +6,8 @@ import imgui.*;
 import imgui.callback.*
 import imgui.flag.*
 import imgui.gl3.*
+import komet.KeyListener
+import komet.MouseListener
 import org.lwjgl.glfw.GLFW.*
 
 class ImGuiLayer(private val glfwWindow: Long) {
@@ -70,7 +72,7 @@ class ImGuiLayer(private val glfwWindow: Long) {
 
         // ------------------------------------------------------------
         // GLFW callbacks to handle user input
-        glfwSetKeyCallback(glfwWindow) { _: Long, key: Int, _: Int, action: Int, _: Int ->
+        glfwSetKeyCallback(glfwWindow) { w, key, scancode, action, mods ->
             if (action == GLFW_PRESS) {
                 io.setKeysDown(key, true)
             } else if (action == GLFW_RELEASE) {
@@ -80,13 +82,17 @@ class ImGuiLayer(private val glfwWindow: Long) {
             io.keyShift = io.getKeysDown(GLFW_KEY_LEFT_SHIFT) || io.getKeysDown(GLFW_KEY_RIGHT_SHIFT)
             io.keyAlt = io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT)
             io.keySuper = io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER)
+
+            if (!io.wantCaptureKeyboard) {
+                KeyListener.keyCallback(w, key, scancode, action, mods)
+            }
         }
-        glfwSetCharCallback(glfwWindow) { _: Long, c: Int ->
+        glfwSetCharCallback(glfwWindow) { _, c ->
             if (c != GLFW_KEY_DELETE) {
                 io.addInputCharacter(c)
             }
         }
-        glfwSetMouseButtonCallback(glfwWindow) { _: Long, button: Int, action: Int, _: Int ->
+        glfwSetMouseButtonCallback(glfwWindow) { w, button, action, mods ->
             val mouseDown = BooleanArray(5)
             mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE
             mouseDown[1] = button == GLFW_MOUSE_BUTTON_2 && action != GLFW_RELEASE
@@ -97,10 +103,18 @@ class ImGuiLayer(private val glfwWindow: Long) {
             if (!io.wantCaptureMouse && mouseDown[1]) {
                 ImGui.setWindowFocus(null)
             }
+
+            if (!io.wantCaptureMouse) {
+                MouseListener.mouseButtonCallback(w, button, action, mods)
+            }
         }
-        glfwSetScrollCallback(glfwWindow) { _: Long, xOffset: Double, yOffset: Double ->
+        glfwSetScrollCallback(glfwWindow) { w, xOffset, yOffset ->
             io.mouseWheelH = io.mouseWheelH + xOffset.toFloat()
             io.mouseWheel = io.mouseWheel + yOffset.toFloat()
+
+            //if (!io.wantCaptureMouse) { // todo. enable?
+            //    MouseListener.mouseScrollCallback(w, xOffset, yOffset)
+            //}
         }
         io.setSetClipboardTextFn(object : ImStrConsumer() {
             override fun accept(s: String?) {

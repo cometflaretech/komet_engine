@@ -9,13 +9,16 @@ import komet.util.AssetPool
 import komet.util.Vector2
 import imgui.ImGui
 import imgui.ImVec2
+import komet.components.MouseControls
+import komet.editor.Prefabs
 import kotlinx.serialization.*
 import org.lwjgl.glfw.GLFW
 
 @Serializable
 @SerialName("LevelEditorScene")
 class LevelEditorScene : Scene() {
-    @Transient private lateinit var blueStar: Entity
+    @Transient
+    val mouseControls = MouseControls()
 
     override fun load() {
         /*blueStar = addEntity("BlueStar").also { e ->
@@ -58,7 +61,12 @@ class LevelEditorScene : Scene() {
     }
 
     override fun update(dt: Float) {
-        //blueStar.transform.location.x = 450f
+        super.update(dt)
+
+        mouseControls.update(dt)
+        entities["BlueStar"]?.transform?.location?.let {
+            it.x += 0.1f
+        }
 
         //if (KeyListener.keyDown(GLFW_KEY_SPACE)) { // todo. realtime update zIndex
         //    blueStar.zIndex = -blueStar.zIndex
@@ -83,10 +91,10 @@ class LevelEditorScene : Scene() {
 
         val windowX2 = windowPos.x + windowSize.x
 
-        val sprites = AssetPool.getSpriteSheet("assets/textures/stars.png")?.sprites
+        val sprites = AssetPool.getSpriteSheet("assets/textures/world.png")?.sprites
         sprites?.let {
             for ((i, sprite) in it.withIndex()) {
-                val spriteSize = 64f
+                val spriteSize = 128f
                 val id = AssetPool.getTexture(sprite.texture)?.gpuId ?: -1
                 val texCoords = sprite.aTexCoords
 
@@ -100,7 +108,8 @@ class LevelEditorScene : Scene() {
                         texCoords[2].x,
                         texCoords[2].y,
                     )) {
-                    println("Button $i clicked")
+                    //val entity = Prefabs.generateSpriteEntity(sprite, Vector2(spriteSize, spriteSize))
+                    mouseControls.pickUp(sprite, spriteSize)
                 }
                 ImGui.popID()
 

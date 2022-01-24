@@ -14,13 +14,13 @@ import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
 
 object Window {
-    var width: Int = 1920
+    var width: Int = 2560
         private set
 
-    var height: Int = 1080
+    var height: Int = 1440
         private set
 
-    var title: String = "Komet Engine v.0.1.0-alpha.dev.22"
+    var title: String = "Komet Engine v.0.1.0-alpha.dev.23"
         private set
 
     var internalWindow: Long = NULL
@@ -103,6 +103,10 @@ object Window {
         AssetPool.addSpriteSheet(
             "assets/textures/stars.png",
             SpriteSheet(128, 128, 8, 0),
+        )
+        AssetPool.addSpriteSheet(
+            "assets/textures/world.png",
+            SpriteSheet(512, 512, 8, 0),
         )
 
         changeScene(0)

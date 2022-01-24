@@ -1,4 +1,5 @@
 # Komet Engine
+![not found](resources/KometEditor.png?raw=true "Komet Editor")
 
 #### Supported Platforms
 * Windows 10, 11 with JVM installed

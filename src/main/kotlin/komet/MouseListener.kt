@@ -46,7 +46,7 @@ object MouseListener {
 
     val oy: Float
         get() {
-            val currentY = (y / Window.height) * 2f - 1f
+            val currentY = ((Window.height - y) / Window.height) * 2f - 1f
             val tmp = Vector4f(0f, currentY, 0f, 1f)
             Window.currentScene?.camera?.let {
                 tmp.mul(it.inverseProjection).mul(it.inverseView)
