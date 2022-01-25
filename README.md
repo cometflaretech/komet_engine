@@ -4,10 +4,11 @@
 #### Supported Platforms
 * Windows 10, 11 with JVM installed
 * Linux JVM - not tested
-* Other Operating Systems are planned int the future*
+* Other Operating Systems are planned for the future*
 
 #### Supported Rendering Backends
 * OpenGL 4.6
+* Vulkan is planned for the future*
 * BGFX is planned for the future*
 
 #### Supported Audio Backends
