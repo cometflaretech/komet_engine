@@ -1,16 +1,16 @@
 package komet
 
-import komet.components.SpriteRenderer
 import komet.ecs.Entity
 import komet.scene.Scene
 import komet.gfx.Camera
-import komet.gfx.Sprite
 import komet.util.AssetPool
 import komet.util.Vector2
 import imgui.ImGui
 import imgui.ImVec2
+import komet.components.GridLines
 import komet.components.MouseControls
-import komet.editor.Prefabs
+import komet.gfx.debug.DebugDraw
+import komet.util.Vector4
 import kotlinx.serialization.*
 import org.lwjgl.glfw.GLFW
 
@@ -18,7 +18,7 @@ import org.lwjgl.glfw.GLFW
 @SerialName("LevelEditorScene")
 class LevelEditorScene : Scene() {
     @Transient
-    val mouseControls = MouseControls()
+    val levelEditorStuff = Entity()
 
     override fun load() {
         /*blueStar = addEntity("BlueStar").also { e ->
@@ -57,20 +57,22 @@ class LevelEditorScene : Scene() {
 
         camera = Camera(Vector2(-250f, 0f))
 
+        levelEditorStuff.addComponent(MouseControls())
+        levelEditorStuff.addComponent(GridLines())
+
         //serialize("level1.json")
     }
 
     override fun update(dt: Float) {
         super.update(dt)
 
-        mouseControls.update(dt)
-        entities["BlueStar"]?.transform?.location?.let {
-            it.x += 0.1f
-        }
-
-        //if (KeyListener.keyDown(GLFW_KEY_SPACE)) { // todo. realtime update zIndex
-        //    blueStar.zIndex = -blueStar.zIndex
-        //}
+        levelEditorStuff.update(dt)
+        DebugDraw.addCircle(
+            Vector2(200f, 200f),
+            64f,
+            Vector4(0f, 1f, 0f, 1f),
+            1,
+        )
 
         if (KeyListener.keyDown(GLFW.GLFW_KEY_M)) {
             serialize("level1.json")
@@ -91,10 +93,10 @@ class LevelEditorScene : Scene() {
 
         val windowX2 = windowPos.x + windowSize.x
 
-        val sprites = AssetPool.getSpriteSheet("assets/textures/world.png")?.sprites
+        val sprites = AssetPool.getSpriteSheet("assets/textures/pk3_island_tilemap.png")?.sprites
         sprites?.let {
             for ((i, sprite) in it.withIndex()) {
-                val spriteSize = 128f
+                val spriteSize = 64f
                 val id = AssetPool.getTexture(sprite.texture)?.gpuId ?: -1
                 val texCoords = sprite.aTexCoords
 
@@ -103,13 +105,13 @@ class LevelEditorScene : Scene() {
                         id,
                         spriteSize,
                         spriteSize,
-                        texCoords[0].x,
-                        texCoords[0].y,
                         texCoords[2].x,
+                        texCoords[0].y,
+                        texCoords[0].x,
                         texCoords[2].y,
                     )) {
                     //val entity = Prefabs.generateSpriteEntity(sprite, Vector2(spriteSize, spriteSize))
-                    mouseControls.pickUp(sprite, spriteSize)
+                    levelEditorStuff.getComponent(MouseControls::class.java)?.pickUp(sprite, spriteSize)
                 }
                 ImGui.popID()
 

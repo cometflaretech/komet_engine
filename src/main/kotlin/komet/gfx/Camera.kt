@@ -16,6 +16,9 @@ class Camera(var location: Vector2 = Vector2()) {
     var projectionMatrix = Matrix4f()
         private set
 
+    var projectionSize = Vector2(32f * 40f, 32f * 21f)
+        private set
+
     val computedViewMatrix: Matrix4f
         get() {
             val cameraFront = Vector3f(0f, 0f, -1f)
@@ -36,7 +39,7 @@ class Camera(var location: Vector2 = Vector2()) {
 
     fun adjustProjection() {
         projectionMatrix.identity()
-        projectionMatrix.ortho(0f, 32f * 40f, 0f, 32f * 21f, 0f, 100f)
+        projectionMatrix.ortho(0f, projectionSize.x, 0f, projectionSize.y, 0f, 100f)
         projectionMatrix.invert(inverseProjection)
     }
 }

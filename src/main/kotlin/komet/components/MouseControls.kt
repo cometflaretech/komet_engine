@@ -7,6 +7,7 @@ import komet.ecs.Component
 import komet.ecs.Entity
 import komet.editor.Prefabs
 import komet.gfx.Sprite
+import komet.util.Settings
 import komet.util.Vector2
 import org.lwjgl.glfw.GLFW.GLFW_KEY_F
 import org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT
@@ -35,8 +36,10 @@ class MouseControls : Component() {
     }
 
     override fun update(dt: Float) = holdingEntity?.let {
-        it.transform.location.x = MouseListener.ox - holdingSpriteSize / 2f
-        it.transform.location.y = MouseListener.oy - holdingSpriteSize / 2f
+        it.transform.location.x =
+            ((MouseListener.ox / Settings.gridWidth).toInt() * Settings.gridWidth).toFloat()
+        it.transform.location.y =
+            ((MouseListener.oy / Settings.gridHeight).toInt() * Settings.gridHeight).toFloat()
 
         if (KeyListener.keyDown(GLFW_KEY_F)) {
             if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {

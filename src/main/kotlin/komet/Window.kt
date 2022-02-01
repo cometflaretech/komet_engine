@@ -3,6 +3,7 @@ package komet
 import komet.scene.Scene
 import komet.editor.ImGuiLayer
 import komet.gfx.SpriteSheet
+import komet.gfx.debug.DebugDraw
 import komet.scene.SceneSerialization
 import komet.util.AssetPool
 import komet.util.Time
@@ -20,7 +21,7 @@ object Window {
     var height: Int = 1440
         private set
 
-    var title: String = "Komet Engine v.0.1.0-alpha.dev.23"
+    var title: String = "Komet Engine v.0.1.0-alpha.dev.26"
         private set
 
     var internalWindow: Long = NULL
@@ -108,6 +109,10 @@ object Window {
             "assets/textures/world.png",
             SpriteSheet(512, 512, 8, 0),
         )
+        AssetPool.addSpriteSheet(
+            "assets/textures/pk3_island_tilemap.png",
+            SpriteSheet(128, 128, 64, 0),
+        )
 
         changeScene(0)
     }
@@ -120,6 +125,8 @@ object Window {
             // Poll events
             glfwPollEvents()
 
+            DebugDraw.beginFrame()
+
             glClearColor(r, g, b, a)
             glClear(GL_COLOR_BUFFER_BIT)
 
@@ -127,6 +134,7 @@ object Window {
             // and the memory for the scene has been allocated.
             if (dt >= 0f) {
                 currentScene?.apply {
+                    DebugDraw.draw()
                     update(dt)
                     render()
                 }
