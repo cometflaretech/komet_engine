@@ -6,6 +6,8 @@ import imgui.*;
 import imgui.callback.*
 import imgui.flag.*
 import imgui.gl3.*
+import imgui.internal.ImGuiWindow
+import imgui.type.ImBoolean
 import komet.KeyListener
 import komet.MouseListener
 import org.lwjgl.glfw.GLFW.*
@@ -27,7 +29,8 @@ class ImGuiLayer(private val glfwWindow: Long) {
         // Initialize ImGuiIO config
         val io: ImGuiIO = ImGui.getIO()
         io.iniFilename = "imgui.ini"
-        io.configFlags = ImGuiConfigFlags.NavEnableKeyboard // Navigation with keyboard
+        io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard) // Navigation with keyboard
+        io.addConfigFlags(ImGuiConfigFlags.DockingEnable)
         io.backendFlags = ImGuiBackendFlags.HasMouseCursors // Mouse cursors to display while resizing windows etc.
         io.backendPlatformName = "imgui_java_impl_glfw"
 
@@ -104,11 +107,11 @@ class ImGuiLayer(private val glfwWindow: Long) {
                 ImGui.setWindowFocus(null)
             }
 
-            if (!io.wantCaptureMouse) {
+            if (!io.wantCaptureMouse || GameViewWindow.wantCaptureMouse) {
                 MouseListener.mouseButtonCallback(w, button, action, mods)
             }
         }
-        glfwSetScrollCallback(glfwWindow) { w, xOffset, yOffset ->
+        glfwSetScrollCallback(glfwWindow) { _, xOffset, yOffset ->
             io.mouseWheelH = io.mouseWheelH + xOffset.toFloat()
             io.mouseWheel = io.mouseWheel + yOffset.toFloat()
 
@@ -145,8 +148,10 @@ class ImGuiLayer(private val glfwWindow: Long) {
     fun update(dt: Float, scene: Scene) {
         startFrame(dt)
         ImGui.newFrame()
+        setupDockSpace()
         scene.sceneImgui()
-        //ImGui.showDemoWindow()
+        GameViewWindow.imgui()
+        ImGui.end()
         ImGui.render()
         endFrame()
     }
@@ -182,5 +187,26 @@ class ImGuiLayer(private val glfwWindow: Long) {
     private fun destroyImGui() {
         imGuiGl3.dispose()
         ImGui.destroyContext()
+    }
+
+    private fun setupDockSpace() {
+        var windowFlags = ImGuiWindowFlags.MenuBar or ImGuiWindowFlags.NoDocking
+
+        ImGui.setNextWindowPos(0f, 0f, ImGuiCond.Always)
+        ImGui.setNextWindowSize(Window.width.toFloat(), Window.height.toFloat())
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0f)
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f)
+
+        windowFlags = windowFlags or
+                ImGuiWindowFlags.NoTitleBar or
+                ImGuiWindowFlags.NoCollapse or
+                ImGuiWindowFlags.NoResize or
+                ImGuiWindowFlags.NoMove or
+                ImGuiWindowFlags.NoBringToFrontOnFocus or
+                ImGuiWindowFlags.NoNavFocus
+
+        ImGui.begin("DockSpace Demo", ImBoolean(true), windowFlags)
+        ImGui.popStyleVar(2)
+        ImGui.dockSpace(ImGui.getID("DockSpace"))
     }
 }

@@ -2,6 +2,7 @@ package komet
 
 import komet.scene.Scene
 import komet.editor.ImGuiLayer
+import komet.gfx.FrameBuffer
 import komet.gfx.SpriteSheet
 import komet.gfx.debug.DebugDraw
 import komet.scene.SceneSerialization
@@ -15,13 +16,15 @@ import org.lwjgl.opengl.GL11.*
 import org.lwjgl.system.MemoryUtil.NULL
 
 object Window {
+    fun getTargetAspectRatio() = 16f / 9f
+
     var width: Int = 2560
         private set
 
     var height: Int = 1440
         private set
 
-    var title: String = "Komet Engine v.0.1.0-alpha.dev.26"
+    var title: String = "Komet Engine v.0.1.0-alpha.dev.30"
         private set
 
     var internalWindow: Long = NULL
@@ -30,9 +33,12 @@ object Window {
     var currentScene: Scene? = null
         private set
 
-    var r = 0f
-    var g = 0f
-    var b = 0f
+    var frameBuffer: FrameBuffer? = null
+        private set
+
+    var r = 1f
+    var g = 1f
+    var b = 1f
     var a = 1f
 
     private var imguiLayer: ImGuiLayer? = null
@@ -100,6 +106,9 @@ object Window {
         // Initialize ImGui library
         imguiLayer = ImGuiLayer(internalWindow).also { it.initImGui() }
 
+        frameBuffer = FrameBuffer(3840, 2160)
+        glViewport(0, 0, 3840, 2160)
+
         // Load resources
         AssetPool.addSpriteSheet(
             "assets/textures/stars.png",
@@ -127,6 +136,8 @@ object Window {
 
             DebugDraw.beginFrame()
 
+            frameBuffer?.bind()
+
             glClearColor(r, g, b, a)
             glClear(GL_COLOR_BUFFER_BIT)
 
@@ -139,6 +150,8 @@ object Window {
                     render()
                 }
             }
+
+            frameBuffer?.unbind()
 
             currentScene?.let { imguiLayer?.update(dt, it) }
             glfwSwapBuffers(internalWindow)

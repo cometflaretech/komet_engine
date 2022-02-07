@@ -1,5 +1,7 @@
 package komet
 
+import komet.util.Vector2
+import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW.GLFW_PRESS
 import org.lwjgl.glfw.GLFW.GLFW_RELEASE
@@ -12,6 +14,9 @@ object MouseListener {
     private var lastX = 0.0
     private var lastY = 0.0
     private var mouseButtonPressed = BooleanArray(8)
+
+    var gameViewportPos = Vector2(0f)
+    var gameViewportSize = Vector2(0f)
 
     var dragging = false
         private set
@@ -36,20 +41,24 @@ object MouseListener {
 
     val ox: Float
         get() {
-            val currentX = (x / Window.width) * 2f - 1f
+            val currentX = ((x - gameViewportPos.x) / gameViewportSize.x) * 2f - 1f
             val tmp = Vector4f(currentX, 0f, 0f, 1f)
             Window.currentScene?.camera?.let {
-                tmp.mul(it.inverseProjection).mul(it.inverseView)
+                val viewProjection = Matrix4f()
+                it.inverseView.mul(it.inverseProjection, viewProjection)
+                tmp.mul(viewProjection)
             }
             return tmp.x
         }
 
     val oy: Float
         get() {
-            val currentY = ((Window.height - y) / Window.height) * 2f - 1f
+            val currentY = -(((y - gameViewportPos.y) / gameViewportSize.y) * 2f - 1f)
             val tmp = Vector4f(0f, currentY, 0f, 1f)
             Window.currentScene?.camera?.let {
-                tmp.mul(it.inverseProjection).mul(it.inverseView)
+                val viewProjection = Matrix4f()
+                it.inverseView.mul(it.inverseProjection, viewProjection)
+                tmp.mul(viewProjection)
             }
             return tmp.y
         }

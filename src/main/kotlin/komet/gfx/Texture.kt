@@ -14,12 +14,42 @@ class Texture {
     var channels = 0
         private set
 
-    var gpuId = 0
+    var gpuId = -1
         private set
+
+    var filePath = ""
 
     private var bound = false
 
+    constructor()
+
+    constructor(width_: Int, height_: Int) {
+        filePath = "Generated"
+
+        // Generate texture on the GPU and bind it
+        gpuId = glGenTextures()
+        glBindTexture(GL_TEXTURE_2D, gpuId)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            width_,
+            height_,
+            0,
+            GL_RGB,
+            GL_UNSIGNED_BYTE,
+            0,
+        )
+    }
+
+
     fun build(filePath: String) {
+        this.filePath = filePath
+
         // Generate texture on the GPU and bind it
         gpuId = glGenTextures()
         glBindTexture(GL_TEXTURE_2D, gpuId)
@@ -83,5 +113,22 @@ class Texture {
             glBindTexture(GL_TEXTURE_2D, 0)
             bound = false
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        if (other !is Texture) return false
+        return other.width == this.width && other.height == this.height && other.gpuId == this.gpuId &&
+                other.filePath == this.filePath
+    }
+
+    override fun hashCode(): Int {
+        var result = width
+        result = 31 * result + height
+        result = 31 * result + channels
+        result = 31 * result + gpuId
+        result = 31 * result + filePath.hashCode()
+        result = 31 * result + bound.hashCode()
+        return result
     }
 }
